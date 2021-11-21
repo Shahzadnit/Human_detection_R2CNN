@@ -1,0 +1,68 @@
+MODEL:
+  META_ARCHITECTURE: "GeneralizedRCNN"
+  WEIGHT: "./output/pytorch_pretrained3.pth" #DOTA
+  # WEIGHT: "./output/plain_pvanet_feat_map/model_final.pth" #ICDAR
+  CLS_AGNOSTIC_BBOX_REG: False
+  DEVICE: "cuda:0"
+  BACKBONE:
+    CONV_BODY: "PVANET"
+    # CONV_BODY: "Res_Net_101"
+  RESNETS:
+    BACKBONE_OUT_CHANNELS: 256
+  RPN:
+    USE_FPN: False
+    ANCHOR_STRIDE: (8,)
+    ANCHOR_SIZES: (2, 3, 5, 9, 16, 32)
+    ASPECT_RATIOS: (0.333, 0.5, 0.667, 1.0, 1.5, 2.0, 3.0)
+    PRE_NMS_TOP_N_TRAIN: 12000
+    PRE_NMS_TOP_N_TEST: 12000
+    POST_NMS_TOP_N_TEST: 200
+    FPN_POST_NMS_TOP_N_TEST: 2000
+    RPN_HEAD: "PVARPNHead"
+  ROI_HEADS:
+    USE_FPN: False
+    BBOX_REG_WEIGHTS: (10., 10., 5., 5.)
+    SCORE_THRESH: 0.80
+    NMS: 0.5
+    DETECTIONS_PER_IMG: 100
+  ROI_BOX_HEAD:
+    POOLER_RESOLUTION: 8 #11 #7
+    POOLER_SCALES: (0.125,)
+    POOLER_SAMPLING_RATIO: 2
+    FEATURE_EXTRACTOR: "PVABOXFeatureExtractor"
+    PREDICTOR: "FastRCNNPredictor"
+    MLP_HEAD_DIM: 4096
+    NUM_CLASSES: 2
+  ROI_MASK_HEAD:
+    POOLER_SCALES: (0.125,)
+    FEATURE_EXTRACTOR: "MaskRCNNFPNFeatureExtractor"
+    PREDICTOR: "MaskRCNNC4Predictor"
+    POOLER_RESOLUTION: 14
+    POOLER_SAMPLING_RATIO: 2
+    RESOLUTION: 28
+    SHARE_BOX_FEATURE_EXTRACTOR: False
+  MASK_ON: False
+DATASETS:
+  #TRAIN: ("icdar_WCCL_train",)
+  TRAIN: ("icdar_human_train",)
+  #TRAIN: ("icdar_SL_train",)
+  #TRAIN: ("icdar_MT_min_rect_train",)
+  #TRAIN: ("icdar_2015_train",)
+  # TRAIN: ("icdar_dota_train",)
+  TEST: ("icdar_human_test",)
+  # TEST: ("icdar_dota_val",)
+  # SCALES: (416, 448, 480, 512, 544, 576, 608, 640, 672, 704, 736, 768, 800, 832, 864)
+  SCALES: (640, 720, 736, 832, 928, 1024,)
+  # SCALES: (720,)
+  SCALE_MULTIPLE_OF: 32
+  MAX_SIZE: 1440
+  # TEST: ("icdar_2015_test",)
+DATALOADER:
+  SIZE_DIVISIBILITY: 32
+SOLVER:
+  BASE_LR: 0.001
+  WEIGHT_DECAY: 0.001
+  STEPS: (10000,25000,)
+  MAX_ITER: 30000
+  IMS_PER_BATCH: 1
+OUTPUT_DIR: "./output/human"
